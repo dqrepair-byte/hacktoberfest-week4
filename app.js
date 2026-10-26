@@ -1,5 +1,5 @@
 import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.85";
-import { SAFETY_RULES, findNotes, notesToText } from "./kb.js";
+import { SAFETY_RULES, findNotes, notesToText } from "./kb.js?v=6";
 
 const $ = (id) => document.getElementById(id);
 let engine = null;

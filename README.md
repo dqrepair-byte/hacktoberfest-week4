@@ -10,7 +10,7 @@ Built for the DEV Hacktoberfest 2026 Open-Source AI Challenge, Week 4: Ghost in 
 
 ## How it works
 
-- **Open-weight model, local inference.** [WebLLM](https://github.com/mlc-ai/web-llm) runs Google's Gemma 2 2B (default), Llama 3.2 3B or Qwen 2.5 1.5B on your GPU through WebGPU, inside a web worker. The model downloads once and is cached by the browser.
+- **Open-weight model, local inference.** [WebLLM](https://github.com/mlc-ai/web-llm) runs Google's Gemma 3 1B (default, about 0.7 GB of video memory), Gemma 2 2B or Qwen 2.5 1.5B on your GPU through WebGPU, inside a web worker. The model downloads once and is cached by the browser.
 - **Field notes as grounding.** `kb.js` holds troubleshooting notes written from real appliance-repair experience: symptoms, likely causes, safe checks, and when to call a pro. The best matches for your symptom are handed to the model so it stays grounded instead of inventing repairs.
 - **Safety rules baked in.** The prompt and the page both put safety first: unplug before opening panels, leave the house if you smell gas, never bypass safety devices, never open a microwave cabinet.
 

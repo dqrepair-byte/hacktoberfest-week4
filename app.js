@@ -13,6 +13,22 @@ if (!("gpu" in navigator)) {
   $("load").disabled = true;
 }
 
+// The GPU can drop the model (out of video memory, driver reset). When that happens,
+// throw the engine away and let the user summon it again instead of failing forever.
+function isLostModel(err) {
+  return /disposed|not loaded|device (was )?lost|GPUDevice|out of memory/i.test(String(err?.message || err));
+}
+
+function resetEngine(message) {
+  try { engine?.unload?.(); } catch {}
+  engine = null;
+  $("go").disabled = true;
+  $("load").disabled = false;
+  $("model").disabled = false;
+  $("bar").style.width = "0%";
+  $("load-status").textContent = message;
+}
+
 $("load").addEventListener("click", async () => {
   modelId = $("model").value;
   $("load").disabled = true;
@@ -32,9 +48,11 @@ $("load").addEventListener("click", async () => {
     $("load-status").textContent = "The tech is here. Everything from now on runs on your device.";
     $("go").disabled = false;
   } catch (err) {
-    $("load-status").textContent = `Couldn't load the model: ${err.message || err}`;
-    $("load").disabled = false;
-    $("model").disabled = false;
+    resetEngine(
+      isLostModel(err)
+        ? "Your GPU ran out of room for this model. Pick Gemma 3 1B and try again, or close other tabs first."
+        : `Couldn't load the model: ${err.message || err}`
+    );
   }
 });
 
@@ -78,15 +96,21 @@ $("ask").addEventListener("submit", async (e) => {
         ? [{ role: "user", content: `${SYSTEM}\n\n${user}` }]
         : [{ role: "system", content: SYSTEM }, { role: "user", content: user }],
       temperature: 0.3,
-      max_tokens: 700,
+      max_tokens: 500,
       stream: true,
     });
     for await (const chunk of stream) {
       $("answer").textContent += chunk.choices[0]?.delta?.content || "";
     }
   } catch (err) {
+    if (isLostModel(err)) {
+      $("answer").textContent =
+        "The ghost lost its grip. Your GPU dropped the model, which usually means it ran short on video memory. Pick Gemma 3 1B (the lightest), press Load model again, and ask once more. It loads faster the second time.";
+      resetEngine("The model was unloaded. Press Load model to keep going.");
+      return;
+    }
     $("answer").textContent = `Something went wrong: ${err.message || err}`;
   } finally {
-    $("go").disabled = false;
+    if (engine) $("go").disabled = false;
   }
 });

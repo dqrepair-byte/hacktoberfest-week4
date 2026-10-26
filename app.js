@@ -43,7 +43,10 @@ $("load").addEventListener("click", async () => {
           $("bar").style.width = `${Math.round(r.progress * 100)}%`;
           $("load-status").textContent = r.text;
         },
-      }
+      },
+      // Gemma 3's config ships both a context window and a sliding window, which WebLLM refuses.
+      // Use a plain 2k context: enough for the notes and the answer, and light on video memory.
+      modelId.startsWith("gemma3") ? { context_window_size: 2048, sliding_window_size: -1 } : undefined
     );
     $("load-status").textContent = "The tech is here. Everything from now on runs on your device.";
     $("go").disabled = false;

@@ -1,5 +1,5 @@
 import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.85";
-import { SAFETY_RULES, findNotes, notesToText } from "./kb.js?v=6";
+import { SAFETY_RULES, findNotes, notesToText } from "./kb.js?v=7";
 
 const $ = (id) => document.getElementById(id);
 let engine = null;
@@ -44,9 +44,14 @@ $("load").addEventListener("click", async () => {
           $("load-status").textContent = r.text;
         },
       },
-      // Gemma 3's config ships both a context window and a sliding window, which WebLLM refuses.
-      // Use a plain 2k context: enough for the notes and the answer, and light on video memory.
-      modelId.startsWith("gemma3") ? { context_window_size: 2048, sliding_window_size: -1 } : undefined
+      {
+        // Read the prompt in small pieces. One big pass can run past the GPU driver's time
+        // limit on integrated graphics, and the driver then resets and drops the model.
+        prefill_chunk_size: 128,
+        // Gemma 3's config ships both a context window and a sliding window, which WebLLM refuses.
+        // Use a plain 2k context: enough for the notes and the answer, and light on video memory.
+        ...(modelId.startsWith("gemma3") ? { context_window_size: 2048, sliding_window_size: -1 } : {}),
+      }
     );
     $("load-status").textContent = "The tech is here. Everything from now on runs on your device.";
     $("go").disabled = false;
@@ -78,7 +83,7 @@ $("ask").addEventListener("submit", async (e) => {
   const symptom = $("symptom").value.trim();
   const brand = $("brand").value.trim();
   const code = $("code").value.trim();
-  const notes = findNotes(appliance, `${symptom} ${code}`);
+  const notes = findNotes(appliance, `${symptom} ${code}`, 2);
   $("notes").textContent = notesToText(notes);
 
   const details = [
@@ -108,7 +113,7 @@ $("ask").addEventListener("submit", async (e) => {
   } catch (err) {
     if (isLostModel(err)) {
       $("answer").textContent =
-        "The ghost lost its grip. Your GPU dropped the model, which usually means it ran short on video memory. Pick Gemma 3 1B (the lightest), press Load model again, and ask once more. It loads faster the second time.";
+        "The ghost lost its grip. Your graphics card dropped the model, which happens on some older or built-in GPUs. Pick Gemma 3 1B (the lightest), press Load model again, and ask once more. If it keeps happening, restart the browser first.";
       resetEngine("The model was unloaded. Press Load model to keep going.");
       return;
     }

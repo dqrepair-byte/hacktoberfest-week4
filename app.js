@@ -3,6 +3,7 @@ import { SAFETY_RULES, findNotes, notesToText } from "./kb.js";
 
 const $ = (id) => document.getElementById(id);
 let engine = null;
+let modelId = null;
 
 $("safety").innerHTML = SAFETY_RULES.map((r) => `<li>${r}</li>`).join("");
 
@@ -13,7 +14,7 @@ if (!("gpu" in navigator)) {
 }
 
 $("load").addEventListener("click", async () => {
-  const modelId = $("model").value;
+  modelId = $("model").value;
   $("load").disabled = true;
   $("model").disabled = true;
   document.querySelector(".progress").hidden = false;
@@ -28,7 +29,7 @@ $("load").addEventListener("click", async () => {
         },
       }
     );
-    $("load-status").textContent = "Ready. Everything from here runs on your device.";
+    $("load-status").textContent = "The tech is here. Everything from now on runs on your device.";
     $("go").disabled = false;
   } catch (err) {
     $("load-status").textContent = `Couldn't load the model: ${err.message || err}`;
@@ -37,12 +38,13 @@ $("load").addEventListener("click", async () => {
   }
 });
 
-const SYSTEM = `You are Fix-It Friend, a patient appliance repair technician with years of field experience, helping a homeowner.
+const SYSTEM = `You are Ghost Tech, the friendly ghost of an old appliance repairman who spent decades on service calls and still can't stop fixing things. You talk plainly and kindly, a little old-school, like a tech standing in someone's laundry room. One light spooky touch per answer at most; never let the character get in the way of the help.
 Rules:
 - Safety comes first. If anything suggests a gas smell, burning, sparking, or work inside a microwave cabinet, tell them to stop and call a pro or the gas company. Always say to unplug or shut off the breaker before opening panels.
 - Never tell anyone to bypass a door switch, thermal fuse, or other safety device.
 - Base your answer on the field notes provided. If the notes don't cover it, say what you'd check first and be honest about uncertainty. Do not invent part numbers.
 - If an error code is given and you are not sure what it means for that brand, say to look it up in the owner's manual or the brand's support page instead of guessing.
+- If it's an old machine that's worth saving, say so. Repair beats the landfill when it's safe and sensible.
 Answer in this order, short and plain:
 1. Most likely causes, most likely first.
 2. Step-by-step checks they can do safely, simplest first.
@@ -71,10 +73,10 @@ $("ask").addEventListener("submit", async (e) => {
   $("go").disabled = true;
   try {
     const stream = await engine.chat.completions.create({
-      messages: [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: user },
-      ],
+      // Gemma's chat template has no system role, so fold the instructions into the first user turn.
+      messages: modelId.startsWith("gemma")
+        ? [{ role: "user", content: `${SYSTEM}\n\n${user}` }]
+        : [{ role: "system", content: SYSTEM }, { role: "user", content: user }],
       temperature: 0.3,
       max_tokens: 700,
       stream: true,

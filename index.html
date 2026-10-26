@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fix-It Friend</title>
+  <meta name="description" content="A pocket appliance tech that runs an open-weight AI model entirely in your browser.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Fix-It Friend</h1>
+      <p class="tag">A pocket appliance tech. The AI runs on your own device, so nothing you type leaves your computer.</p>
+    </header>
+
+    <section id="model-box" class="card">
+      <h2>1. Load the helper</h2>
+      <p class="muted">First load downloads the open-weight model once (about 1 to 2 GB) and caches it in your browser. Needs a browser with WebGPU, like recent Chrome or Edge on a desktop.</p>
+      <div class="row">
+        <select id="model">
+          <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B (better answers)</option>
+          <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen 2.5 1.5B (lighter, faster)</option>
+        </select>
+        <button id="load">Load model</button>
+      </div>
+      <div class="progress" hidden><div id="bar"></div></div>
+      <p id="load-status" class="muted" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>2. Tell it what's wrong</h2>
+      <form id="ask">
+        <label>Appliance
+          <select id="appliance">
+            <option value="washer">Washer</option>
+            <option value="dryer">Dryer</option>
+            <option value="refrigerator">Refrigerator</option>
+            <option value="dishwasher">Dishwasher</option>
+            <option value="oven">Oven or range</option>
+            <option value="microwave">Microwave</option>
+          </select>
+        </label>
+        <label>Brand and model (optional)
+          <input id="brand" placeholder="e.g. Whirlpool WTW5000DW">
+        </label>
+        <label>What's it doing?
+          <textarea id="symptom" rows="3" placeholder="e.g. Dryer runs and the drum turns but there's no heat" required></textarea>
+        </label>
+        <label>Error code on the display (optional)
+          <input id="code" placeholder="e.g. F21">
+        </label>
+        <button id="go" type="submit" disabled>Diagnose</button>
+      </form>
+    </section>
+
+    <section id="answer-box" class="card" hidden>
+      <h2>What to check</h2>
+      <div id="answer" aria-live="polite"></div>
+      <details id="notes-box">
+        <summary>Field notes the helper used</summary>
+        <pre id="notes"></pre>
+      </details>
+    </section>
+
+    <section class="card safety">
+      <h2>Safety first</h2>
+      <ul id="safety"></ul>
+    </section>
+
+    <footer class="muted">
+      Open source. Model runs locally with <a href="https://github.com/mlc-ai/web-llm">WebLLM</a>.
+      This is general guidance, not a substitute for a licensed technician.
+    </footer>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

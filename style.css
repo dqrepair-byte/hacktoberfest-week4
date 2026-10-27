@@ -66,7 +66,8 @@ h1 { font: 400 clamp(2.6rem, 9vw, 3.6rem)/1 var(--display); letter-spacing: 0.02
 .glass { fill: var(--glass); }
 .eye { fill: var(--glow); }
 .pupil { fill: var(--night); }
-.mouth { fill: var(--night); stroke: var(--night); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mouth { fill: none; stroke: var(--glow); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#ap-refrigerator .mouth, .ap .mouth[d$="z"] { fill: var(--glass); }
 .ap .eye { animation: blink 6s infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 

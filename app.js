@@ -1,15 +1,16 @@
 import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.85";
-import { SAFETY_RULES, findNotes, notesToText } from "./kb.js?v=7";
+import { SAFETY_RULES, findNotes, notesToText } from "./kb.js?v=8";
 
 const $ = (id) => document.getElementById(id);
 let engine = null;
 let modelId = null;
+const appliance = () => document.querySelector('input[name="appliance"]:checked')?.value || "washer";
 
 $("safety").innerHTML = SAFETY_RULES.map((r) => `<li>${r}</li>`).join("");
 
 if (!("gpu" in navigator)) {
   $("load-status").textContent =
-    "This browser doesn't support WebGPU, so the model can't run here. Try recent Chrome or Edge on a desktop.";
+    "This browser can't run the AI model (no WebGPU). The ghost will still answer from its field notes. For the full AI answer, try recent Chrome or Edge on a desktop.";
   $("load").disabled = true;
 }
 
@@ -22,7 +23,6 @@ function isLostModel(err) {
 function resetEngine(message) {
   try { engine?.unload?.(); } catch {}
   engine = null;
-  $("go").disabled = true;
   $("load").disabled = false;
   $("model").disabled = false;
   $("bar").style.width = "0%";
@@ -53,12 +53,11 @@ $("load").addEventListener("click", async () => {
         ...(modelId.startsWith("gemma3") ? { context_window_size: 2048, sliding_window_size: -1 } : {}),
       }
     );
-    $("load-status").textContent = "The tech is here. Everything from now on runs on your device.";
-    $("go").disabled = false;
+    $("load-status").textContent = "The tech has arrived. Everything from now on runs on your device.";
   } catch (err) {
     resetEngine(
       isLostModel(err)
-        ? "Your GPU ran out of room for this model. Pick Gemma 3 1B and try again, or close other tabs first."
+        ? "Your graphics card couldn't hold this model. Pick Gemma 3 1B and try again, or close other tabs first. The ghost still answers from its field notes meanwhile."
         : `Couldn't load the model: ${err.message || err}`
     );
   }
@@ -76,18 +75,40 @@ Answer in this order, short and plain:
 2. Step-by-step checks they can do safely, simplest first.
 3. When to stop and call a pro.`;
 
+// When the AI can't run on this computer, the ghost still answers straight from the field notes.
+function notesAnswer(notes, why) {
+  const box = $("answer");
+  box.textContent = "";
+  const p = document.createElement("p");
+  p.className = "from-notes";
+  p.textContent = why;
+  box.append(p);
+  const n = notes[0];
+  box.append(
+    `Most likely causes, most likely first:\n${n.causes.map((c, i) => `${i + 1}. ${c}`).join("\n")}\n\n` +
+    `Checks you can do safely, simplest first:\n${n.checks.map((c, i) => `${i + 1}. ${c}`).join("\n")}\n\n` +
+    `When to call a living tech:\n${n.pro}\n\n` +
+    `Unplug it or flip the breaker before you open any panel.`
+  );
+}
+
+// Show the chosen machine above the answer, and make it rattle while the ghost is working.
+function showAppliance(name, working) {
+  $("answer-ap").querySelector("use").setAttribute("href", `#ap-${name}`);
+  $("answer-ap").classList.toggle("working", working);
+}
+
 $("ask").addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!engine) return;
-  const appliance = $("appliance").value;
+  const machine = appliance();
   const symptom = $("symptom").value.trim();
   const brand = $("brand").value.trim();
   const code = $("code").value.trim();
-  const notes = findNotes(appliance, `${symptom} ${code}`, 2);
+  const notes = findNotes(machine, `${symptom} ${code}`, 2);
   $("notes").textContent = notesToText(notes);
 
   const details = [
-    `Appliance: ${appliance}`,
+    `Appliance: ${machine}`,
     brand && `Brand/model: ${brand}`,
     `Symptom: ${symptom}`,
     code && `Error code shown: ${code}`,
@@ -95,8 +116,17 @@ $("ask").addEventListener("submit", async (e) => {
   const user = `${details.join("\n")}\n\nField notes:\n${notesToText(notes)}`;
 
   $("answer-box").hidden = false;
+  $("answer-box").scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!engine) {
+    showAppliance(machine, false);
+    notesAnswer(notes, "gpu" in navigator
+      ? "This one comes straight from the ghost's field notes. Summon the tech above for a fuller answer from the AI."
+      : "This computer can't run the AI, so this comes straight from the ghost's field notes.");
+    return;
+  }
   $("answer").textContent = "";
   $("go").disabled = true;
+  showAppliance(machine, true);
   try {
     const stream = await engine.chat.completions.create({
       // Gemma's chat template has no system role, so fold the instructions into the first user turn.
@@ -112,13 +142,13 @@ $("ask").addEventListener("submit", async (e) => {
     }
   } catch (err) {
     if (isLostModel(err)) {
-      $("answer").textContent =
-        "The ghost lost its grip. Your graphics card dropped the model, which happens on some older or built-in GPUs. Pick Gemma 3 1B (the lightest), press Load model again, and ask once more. If it keeps happening, restart the browser first.";
-      resetEngine("The model was unloaded. Press Load model to keep going.");
+      notesAnswer(notes, "The ghost lost its grip: your graphics card dropped the AI model, which happens on some older or built-in GPUs. Here's what the field notes say instead.");
+      resetEngine("Your graphics card dropped the model. Restart the browser and summon again to try the AI, or keep asking and the ghost answers from its field notes.");
       return;
     }
     $("answer").textContent = `Something went wrong: ${err.message || err}`;
   } finally {
-    if (engine) $("go").disabled = false;
+    $("go").disabled = false;
+    $("answer-ap").classList.remove("working");
   }
 });

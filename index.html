@@ -4,62 +4,139 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ghost Tech</title>
-  <meta name="description" content="The friendly ghost of an old appliance repairman, running on an open-weight AI model entirely in your browser.">
-  <link rel="stylesheet" href="style.css?v=7">
+  <meta name="description" content="The friendly ghost of an old appliance repairman, haunting your browser. Runs on an open-weight AI model entirely on your device.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
+  <!-- Haunted appliance drawings, reused below with <use>. Plain SVG, nothing extra to download. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="eyes" viewBox="0 0 40 14">
+        <ellipse class="eye" cx="10" cy="7" rx="5" ry="6"/><ellipse class="eye" cx="30" cy="7" rx="5" ry="6"/>
+        <circle class="pupil" cx="11" cy="8" r="2"/><circle class="pupil" cx="31" cy="8" r="2"/>
+      </symbol>
+      <symbol id="ap-washer" viewBox="0 0 80 96">
+        <rect class="body" x="4" y="4" width="72" height="88" rx="8"/>
+        <line class="trim" x1="4" y1="22" x2="76" y2="22"/>
+        <circle class="knob" cx="62" cy="13" r="4"/><rect class="trim-f" x="12" y="10" width="26" height="6" rx="2"/>
+        <circle class="door" cx="40" cy="56" r="25"/><circle class="glass" cx="40" cy="56" r="18"/>
+        <use href="#eyes" x="26" y="46" width="28" height="10"/>
+        <path class="mouth" d="M33 64 q7 6 14 0"/>
+      </symbol>
+      <symbol id="ap-dryer" viewBox="0 0 80 96">
+        <rect class="body" x="4" y="4" width="72" height="88" rx="8"/>
+        <line class="trim" x1="4" y1="22" x2="76" y2="22"/>
+        <circle class="knob" cx="18" cy="13" r="4"/><circle class="knob" cx="62" cy="13" r="4"/>
+        <circle class="door" cx="40" cy="56" r="25"/><circle class="glass" cx="40" cy="56" r="18"/>
+        <use href="#eyes" x="26" y="46" width="28" height="10"/>
+        <path class="mouth" d="M32 66 l4 -4 l4 4 l4 -4 l4 4"/>
+      </symbol>
+      <symbol id="ap-refrigerator" viewBox="0 0 70 120">
+        <rect class="body" x="4" y="4" width="62" height="112" rx="8"/>
+        <line class="trim" x1="4" y1="44" x2="66" y2="44"/>
+        <rect class="trim-f" x="56" y="16" width="4" height="18" rx="2"/><rect class="trim-f" x="56" y="54" width="4" height="26" rx="2"/>
+        <use href="#eyes" x="14" y="18" width="34" height="12"/>
+        <path class="mouth" d="M14 70 q17 20 34 0 q-17 8 -34 0z"/>
+      </symbol>
+      <symbol id="ap-dishwasher" viewBox="0 0 80 90">
+        <rect class="body" x="4" y="4" width="72" height="82" rx="6"/>
+        <rect class="trim-f" x="4" y="4" width="72" height="16" rx="6"/>
+        <rect class="glass" x="26" y="9" width="28" height="6" rx="3"/>
+        <use href="#eyes" x="20" y="34" width="40" height="14"/>
+        <path class="mouth" d="M26 64 q14 10 28 0"/>
+      </symbol>
+      <symbol id="ap-oven" viewBox="0 0 80 96">
+        <rect class="body" x="4" y="4" width="72" height="88" rx="6"/>
+        <circle class="knob" cx="18" cy="14" r="4"/><circle class="knob" cx="32" cy="14" r="4"/><circle class="knob" cx="48" cy="14" r="4"/><circle class="knob" cx="62" cy="14" r="4"/>
+        <rect class="door" x="12" y="28" width="56" height="54" rx="4"/><rect class="glass" x="18" y="40" width="44" height="32" rx="3"/>
+        <use href="#eyes" x="22" y="44" width="36" height="12"/>
+        <path class="mouth" d="M30 64 q10 -6 20 0"/>
+      </symbol>
+      <symbol id="ap-microwave" viewBox="0 0 110 70">
+        <rect class="body" x="4" y="4" width="102" height="62" rx="6"/>
+        <rect class="glass" x="12" y="12" width="66" height="46" rx="4"/>
+        <rect class="trim-f" x="86" y="14" width="12" height="20" rx="2"/><circle class="knob" cx="92" cy="46" r="5"/>
+        <use href="#eyes" x="22" y="22" width="46" height="16"/>
+        <path class="mouth" d="M34 48 q11 7 22 0"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="fog" aria-hidden="true"><span></span><span></span></div>
+
   <main>
-    <header>
+    <header class="hero">
       <div class="brand">
-        <svg class="ghost" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4C18 4 10 14 10 28v30l7-6 7 6 8-6 8 6 7-6 7 6V28C54 14 46 4 32 4z"/><circle cx="24" cy="28" r="4" class="eye"/><circle cx="40" cy="28" r="4" class="eye"/></svg>
-        <h1>Ghost Tech</h1>
+        <svg class="ghost" viewBox="0 0 64 70" aria-hidden="true">
+          <path class="sheet" d="M32 4C18 4 10 14 10 28v34l7-6 7 6 8-6 8 6 7-6 7 6V28C54 14 46 4 32 4z"/>
+          <ellipse class="ghost-eye" cx="24" cy="28" rx="3.5" ry="5"/><ellipse class="ghost-eye" cx="40" cy="28" rx="3.5" ry="5"/>
+          <path class="ghost-mouth" d="M27 40 q5 4 10 0"/>
+        </svg>
+        <div>
+          <h1>Ghost Tech</h1>
+          <p class="sub">Appliance repair from beyond the grave</p>
+        </div>
       </div>
-      <p class="tag">The friendly ghost of an old appliance repairman, haunting your browser. Decades of service-call know-how, running on an open-weight model on your own device. Nothing you type leaves your computer.</p>
+      <p class="tag">I spent decades on service calls. Now I haunt your laundry room. Tell me what your machine is doing and I'll tell you where to look, what you can check yourself, and when to call a living tech. I run on an open-weight AI model right on your computer, so nothing you type leaves it.</p>
+      <div class="haunted-row" aria-hidden="true">
+        <svg class="ap a1"><use href="#ap-washer"/></svg>
+        <svg class="ap a2 tall"><use href="#ap-refrigerator"/></svg>
+        <svg class="ap a3"><use href="#ap-dryer"/></svg>
+        <svg class="ap a4 wide"><use href="#ap-microwave"/></svg>
+        <svg class="ap a5"><use href="#ap-oven"/></svg>
+      </div>
     </header>
 
     <section id="model-box" class="card">
-      <h2>1. Summon the tech</h2>
-      <p class="muted">First load downloads the open-weight model once (about 1 to 2 GB) and caches it in your browser. Needs a browser with WebGPU, like recent Chrome or Edge on a desktop.</p>
+      <h2><span class="step">I</span> Summon the tech</h2>
+      <p class="muted">The first summoning downloads the open-weight model once (under 1 GB for the default) and keeps it in your browser. It needs WebGPU, like recent Chrome or Edge on a desktop. If your computer can't run it, the ghost still answers from its field notes.</p>
       <div class="row">
-        <select id="model">
-          <option value="gemma3-1b-it-q4f16_1-MLC">Gemma 3 1B (Google's open model, works on most GPUs)</option>
+        <select id="model" aria-label="Model">
+          <option value="gemma3-1b-it-q4f16_1-MLC">Gemma 3 1B (Google's open model, lightest)</option>
           <option value="gemma-2-2b-it-q4f16_1-MLC">Gemma 2 2B (more detail, needs a stronger GPU)</option>
           <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen 2.5 1.5B (alternative)</option>
         </select>
-        <button id="load">Load model</button>
+        <button id="load">Summon</button>
       </div>
       <div class="progress" hidden><div id="bar"></div></div>
       <p id="load-status" class="muted" aria-live="polite"></p>
     </section>
 
     <section class="card">
-      <h2>2. Tell it what's wrong</h2>
+      <h2><span class="step">II</span> Which machine is haunting you?</h2>
       <form id="ask">
-        <label>Appliance
-          <select id="appliance">
-            <option value="washer">Washer</option>
-            <option value="dryer">Dryer</option>
-            <option value="refrigerator">Refrigerator</option>
-            <option value="dishwasher">Dishwasher</option>
-            <option value="oven">Oven or range</option>
-            <option value="microwave">Microwave</option>
-          </select>
-        </label>
-        <label>Brand and model (optional)
-          <input id="brand" placeholder="e.g. Whirlpool WTW5000DW">
-        </label>
+        <fieldset class="picker">
+          <legend class="sr">Appliance</legend>
+          <label class="pick"><input type="radio" name="appliance" value="washer" checked><svg aria-hidden="true"><use href="#ap-washer"/></svg><span>Washer</span></label>
+          <label class="pick"><input type="radio" name="appliance" value="dryer"><svg aria-hidden="true"><use href="#ap-dryer"/></svg><span>Dryer</span></label>
+          <label class="pick"><input type="radio" name="appliance" value="refrigerator"><svg aria-hidden="true"><use href="#ap-refrigerator"/></svg><span>Fridge</span></label>
+          <label class="pick"><input type="radio" name="appliance" value="dishwasher"><svg aria-hidden="true"><use href="#ap-dishwasher"/></svg><span>Dishwasher</span></label>
+          <label class="pick"><input type="radio" name="appliance" value="oven"><svg aria-hidden="true"><use href="#ap-oven"/></svg><span>Oven</span></label>
+          <label class="pick"><input type="radio" name="appliance" value="microwave"><svg aria-hidden="true"><use href="#ap-microwave"/></svg><span>Microwave</span></label>
+        </fieldset>
         <label>What's it doing?
-          <textarea id="symptom" rows="3" placeholder="e.g. Dryer runs and the drum turns but there's no heat" required></textarea>
+          <textarea id="symptom" rows="3" placeholder="e.g. It runs and the drum turns but there's no heat" required></textarea>
         </label>
-        <label>Error code on the display (optional)
-          <input id="code" placeholder="e.g. F21">
-        </label>
-        <button id="go" type="submit" disabled>Ask the ghost</button>
+        <div class="two">
+          <label>Brand and model (optional)
+            <input id="brand" placeholder="e.g. Whirlpool WTW5000DW">
+          </label>
+          <label>Error code (optional)
+            <input id="code" placeholder="e.g. F21">
+          </label>
+        </div>
+        <button id="go" type="submit">Ask the ghost</button>
       </form>
     </section>
 
-    <section id="answer-box" class="card" hidden>
-      <h2>What to check</h2>
+    <section id="answer-box" class="card answer" hidden>
+      <div class="answer-head">
+        <svg id="answer-ap" class="ap possessed" aria-hidden="true"><use href="#ap-washer"/></svg>
+        <h2 id="answer-title">The ghost says</h2>
+      </div>
       <div id="answer" aria-live="polite"></div>
       <details id="notes-box">
         <summary>Field notes the ghost used</summary>
@@ -68,15 +145,15 @@
     </section>
 
     <section class="card safety">
-      <h2>Safety first</h2>
+      <h2>Rules even a ghost won't break</h2>
       <ul id="safety"></ul>
     </section>
 
     <footer class="muted">
-      Built to keep old repair know-how alive. Open source. Model runs locally with <a href="https://github.com/mlc-ai/web-llm">WebLLM</a>.
+      Built to keep old repair know-how alive. Open source. The model runs on your device with <a href="https://github.com/mlc-ai/web-llm">WebLLM</a>.
       General guidance only, not a substitute for a licensed technician.
     </footer>
   </main>
-  <script type="module" src="app.js?v=7"></script>
+  <script type="module" src="app.js?v=8"></script>
 </body>
 </html>

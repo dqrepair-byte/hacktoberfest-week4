@@ -1,42 +1,131 @@
+/* A haunted laundry room at night: deep blue-violet dark, ghostly mint glow,
+   marigold candlelight for the things you press. One look on purpose, light or dark OS alike. */
 :root {
-  --bg: #f6f5f1; --card: #ffffff; --text: #1d1d1b; --muted: #5d5d58;
-  --accent: #c2410c; --marigold: #f59e0b; --warn-bg: #fff4e5; --warn: #8a4b00; --border: #e2e0d8;
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #161615; --card: #20201e; --text: #ecebe6; --muted: #a9a8a1;
-    --accent: #fb923c; --marigold: #fbbf24; --warn-bg: #2b2111; --warn: #f0b45a; --border: #34342f; }
+  color-scheme: dark;
+  --night: #0f1020; --night-2: #17182e; --card: rgba(30, 31, 58, 0.82); --line: #34365e;
+  --text: #ecebf7; --muted: #a9a8c8; --glow: #9ff5d8; --glow-dim: rgba(159, 245, 216, 0.35);
+  --candle: #f6a623; --candle-ink: #1b1204; --blood: #ff7a6b;
+  --appliance: #e8e6f4; --appliance-shade: #b9b6d6; --glass: #1a1b33;
+  --display: "Creepster", "Chiller", fantasy;
+  --type: "Special Elite", "Courier New", monospace;
+  --body: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text);
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
-h1 { margin: 0 0 4px; font-size: 1.9rem; }
-h2 { margin: 0 0 8px; font-size: 1.15rem; }
-.tag { margin: 0 0 20px; color: var(--muted); }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px; margin-bottom: 16px; }
+html { background: var(--night); }
+body {
+  margin: 0; min-height: 100vh; color: var(--text); font: 16px/1.55 var(--body);
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255, 249, 220, 0.9) 0 34px, rgba(255, 249, 220, 0.18) 35px 60px, transparent 120px),
+    radial-gradient(ellipse at 50% 120%, #262556 0%, transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+  background-attachment: fixed;
+}
+main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 28px 16px 56px; }
+a { color: var(--glow); }
+
+/* Fog: two soft bands drifting along the bottom. Transform-only, so it costs the GPU almost nothing. */
+.fog { position: fixed; inset: auto 0 0 0; height: 40vh; pointer-events: none; z-index: 0; overflow: hidden; }
+.fog span { position: absolute; bottom: -10vh; left: -50%; width: 200%; height: 100%;
+  background: radial-gradient(ellipse at 30% 70%, rgba(200, 210, 255, 0.10), transparent 55%),
+              radial-gradient(ellipse at 75% 80%, rgba(159, 245, 216, 0.08), transparent 50%);
+  animation: drift 38s linear infinite; }
+.fog span + span { animation-duration: 55s; animation-direction: reverse; opacity: 0.7; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(25%); } }
+
+/* Header */
+.hero { margin-bottom: 22px; }
+.brand { display: flex; align-items: center; gap: 14px; }
+h1 { font: 400 clamp(2.6rem, 9vw, 3.6rem)/1 var(--display); letter-spacing: 0.02em; margin: 0;
+  color: var(--glow); text-shadow: 0 0 18px var(--glow-dim), 0 0 2px var(--glow); }
+.sub { margin: 4px 0 0; font-family: var(--type); color: var(--candle); }
+.tag { font-family: var(--type); color: var(--muted); max-width: 62ch; margin: 16px 0 8px; }
+.ghost { width: 74px; height: 80px; flex: none; filter: drop-shadow(0 0 14px var(--glow-dim)); animation: float 4.5s ease-in-out infinite; }
+.ghost .sheet { fill: #f5f4ff; opacity: 0.92; }
+.ghost .ghost-eye { fill: var(--night); }
+.ghost .ghost-mouth { fill: none; stroke: var(--night); stroke-width: 2.5; stroke-linecap: round; }
+@keyframes float { 50% { transform: translateY(-8px) rotate(-2deg); } }
+
+/* The haunted appliance row */
+.haunted-row { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 3vw, 24px);
+  margin-top: 14px; padding: 10px 0 18px; border-bottom: 2px dashed var(--line); }
+.ap { width: 64px; height: 78px; overflow: visible; }
+.ap.tall { height: 108px; width: 64px; }
+.ap.wide { width: 92px; height: 60px; }
+.haunted-row .ap { animation: rattle 5s ease-in-out infinite; transform-origin: 50% 100%; }
+.haunted-row .a2 { animation-delay: -1.2s; } .haunted-row .a3 { animation-delay: -2.6s; }
+.haunted-row .a4 { animation-delay: -0.6s; animation-name: hover; } .haunted-row .a5 { animation-delay: -3.4s; }
+@keyframes rattle { 0%, 82%, 100% { transform: rotate(0); } 86% { transform: rotate(-4deg); } 90% { transform: rotate(4deg); } 94% { transform: rotate(-2deg); } }
+@keyframes hover { 50% { transform: translateY(-10px); } }
+
+/* Appliance drawing parts */
+.body { fill: var(--appliance); stroke: var(--appliance-shade); stroke-width: 2; }
+.trim { stroke: var(--appliance-shade); stroke-width: 2; }
+.trim-f { fill: var(--appliance-shade); }
+.knob { fill: var(--appliance-shade); }
+.door { fill: var(--appliance-shade); }
+.glass { fill: var(--glass); }
+.eye { fill: var(--glow); }
+.pupil { fill: var(--night); }
+.mouth { fill: var(--night); stroke: var(--night); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ap .eye { animation: blink 6s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+/* Cards */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 18px;
+  backdrop-filter: blur(3px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+h2 { margin: 0 0 10px; font: 400 1.15rem/1.3 var(--type); color: var(--text); display: flex; align-items: center; gap: 10px; }
+.step { display: inline-grid; place-items: center; min-width: 2em; height: 2em; padding: 0 6px; border-radius: 50%;
+  border: 1px solid var(--glow); color: var(--glow); font-size: 0.85rem; box-shadow: 0 0 10px var(--glow-dim); }
 .muted { color: var(--muted); font-size: 0.92rem; }
-.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
 label { display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.95rem; }
-input, select, textarea { display: block; width: 100%; margin-top: 4px; padding: 10px;
-  border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; }
-.row select { flex: 1 1 220px; width: auto; margin: 0; }
-button { padding: 10px 18px; border: 0; border-radius: 8px; background: var(--accent);
-  color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
-button:disabled { opacity: 0.45; cursor: not-allowed; }
-.progress { height: 8px; background: var(--border); border-radius: 4px; margin-top: 12px; overflow: hidden; }
-#bar { height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
-#answer { white-space: pre-wrap; }
-pre { white-space: pre-wrap; font-size: 0.85rem; color: var(--muted); }
-.safety { background: var(--warn-bg); }
-.safety h2 { color: var(--warn); }
-.safety ul { margin: 0; padding-left: 20px; }
-footer { text-align: center; margin-top: 24px; }
-a { color: var(--accent); }
-.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-.ghost { width: 44px; height: 44px; fill: var(--card); stroke: var(--marigold); stroke-width: 2.5;
-  animation: float 4s ease-in-out infinite; }
-.ghost .eye { fill: var(--text); stroke: none; }
-@keyframes float { 50% { transform: translateY(-5px); } }
-@media (prefers-reduced-motion: reduce) { .ghost { animation: none; } }
-.card { border-top: 3px solid var(--marigold); }
+input, select, textarea { display: block; width: 100%; margin-top: 5px; padding: 10px 12px; font: inherit;
+  border: 1px solid var(--line); border-radius: 9px; background: rgba(10, 11, 26, 0.7); color: var(--text); }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--glow); outline-offset: 1px; }
+.row select { flex: 1 1 240px; width: auto; margin: 0; }
+button { padding: 11px 20px; border: 0; border-radius: 9px; background: var(--candle); color: var(--candle-ink);
+  font: 700 1rem var(--body); cursor: pointer; box-shadow: 0 0 16px rgba(246, 166, 35, 0.35); }
+button:hover:not(:disabled) { filter: brightness(1.08); }
+button:focus-visible { outline: 3px solid var(--glow); outline-offset: 2px; }
+button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.progress { height: 8px; background: var(--line); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+#bar { height: 100%; width: 0; background: var(--glow); box-shadow: 0 0 10px var(--glow); transition: width 0.2s; }
+
+/* Appliance picker */
+.picker { border: 0; padding: 0; margin: 0 0 14px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+@media (max-width: 560px) { .picker { grid-template-columns: repeat(3, 1fr); } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.pick { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px;
+  border: 1px solid var(--line); border-radius: 12px; cursor: pointer; font: 400 0.85rem var(--type); color: var(--muted);
+  transition: border-color 0.15s, transform 0.15s; }
+.pick input { position: absolute; opacity: 0; pointer-events: none; }
+.pick svg { width: 42px; height: 50px; }
+.pick .eye { fill: var(--appliance-shade); }
+.pick:hover { transform: translateY(-2px); }
+.pick:has(input:checked) { border-color: var(--glow); color: var(--text); box-shadow: 0 0 14px var(--glow-dim) inset; }
+.pick:has(input:checked) .eye { fill: var(--glow); }
+.pick:has(input:checked) svg { animation: rattle 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+.pick:has(input:focus-visible) { outline: 2px solid var(--glow); outline-offset: 2px; }
+
+/* Answer */
+.answer { border-color: var(--glow-dim); }
+.answer-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.answer-head h2 { margin: 0; color: var(--glow); }
+.answer-head .ap { width: 52px; height: 62px; flex: none; }
+.possessed.working { animation: rattle 0.9s ease-in-out infinite; transform-origin: 50% 100%; }
+#answer { white-space: pre-wrap; font-size: 1rem; }
+#answer .from-notes { font-family: var(--type); color: var(--candle); margin: 0 0 10px; white-space: normal; }
+details { margin-top: 12px; } summary { cursor: pointer; color: var(--muted); font-family: var(--type); }
+pre { white-space: pre-wrap; font: 0.85rem/1.5 var(--type); color: var(--muted); }
+
+/* Safety stays plain and loud */
+.safety { border-color: rgba(255, 122, 107, 0.5); }
+.safety h2 { color: var(--blood); }
+.safety ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+footer { text-align: center; margin-top: 26px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost, .haunted-row .ap, .ap .eye, .fog span, .pick:has(input:checked) svg, .possessed.working { animation: none !important; }
+}
